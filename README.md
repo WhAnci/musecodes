@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# musecodes
 
-## Getting Started
+A lightweight community utility for sharing Muse referral codes.
 
-First, run the development server:
+## Features
+
+- Submit and browse 6-character Muse referral codes
+- Copy codes and open Muse with one click
+- Community feedback (Worked / Didn't Work) with abuse prevention
+- Status labels derived from recent feedback
+- Featured site owner code (S8D87N) clearly labeled at the top
+- Search, sort, and individual code detail pages
+
+## Stack
+
+- [Next.js](https://nextjs.org/) (App Router)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Supabase](https://supabase.com/) (PostgreSQL)
+- [Vercel](https://vercel.com/) (deployment)
+
+## Setup
+
+### 1. Clone and install
+
+```bash
+npm install
+```
+
+### 2. Create a Supabase project
+
+1. Go to [supabase.com](https://supabase.com) and create a new project.
+2. Open the SQL Editor and run the migration in `supabase/migrations/001_initial_schema.sql`.
+3. Copy your project URL and API keys from **Project Settings → API**.
+
+### 3. Configure environment variables
+
+Copy `.env.example` to `.env.local`:
+
+```bash
+cp .env.example .env.local
+```
+
+Fill in:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+```
+
+### 4. Run locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploy to Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Push this repo to GitHub.
+2. Import the project in [Vercel](https://vercel.com/new).
+3. Add the three environment variables from `.env.example`.
+4. Deploy.
 
-## Learn More
+## Pages
 
-To learn more about Next.js, take a look at the following resources:
+| Route | Description |
+|-------|-------------|
+| `/` | Homepage with featured code, search, stats, and community codes |
+| `/submit` | Submit a new referral code |
+| `/code/[code]` | Individual code details and feedback |
+| `/about` | About and disclaimer |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Database
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `referral_codes` — submitted codes with optional display name
+- `feedback` — anonymous worked/failed reports (one per visitor per code)
+- `rate_limits` — server-side rate limiting for submissions and feedback
+- `referral_codes_with_stats` — view with aggregated feedback counts
 
-## Deploy on Vercel
+## Security
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Server-side validation of all codes (`^[A-Z0-9]{6}$`)
+- Duplicate code prevention
+- One feedback vote per anonymous session per code
+- IP-based rate limiting on submissions and feedback
+- Display names sanitized (no HTML)
+- Writes use service role key via API routes only
